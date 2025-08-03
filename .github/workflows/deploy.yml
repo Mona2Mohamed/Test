@@ -5,30 +5,30 @@ on:
     branches:
       - main
 
-
 jobs:
   build-and-deploy:
-    runs-on: ububtu-latest
+    runs-on: ubuntu-latest
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
 
-
-    - name: Log in Docker Hub
-      run: echo "${{secrets.DOCKER_PASSWORD}}" | docker log -u "${{secrets.DOCKER_USERNAME}}
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Build Docker image
       run: docker build -t mona2mohamed/mysite:latest .
 
-    - name: Push Docker image
-      run: docker push moan2mohamed/mysite:latest
+    - name: Push to Docker Hub
+      run: docker push mona2mohamed/mysite:latest
 
     - name: SSH and update K3s
       uses: appleboy/ssh-action@master
       with:
-        host: ${{secrets.VM_IP}}
-        username: ${{secrets.VM_USER}}
-        key: ${{secrets.SSH_KEY}}
+        host: ${{ secrets.VM_IP }}
+        username: ${{ secrets.VM_USER }}
+        key: ${{ secrets.SSH_KEY }}
         script: |
           docker pull mona2mohamed/mysite:latest
           kubectl rollout restart deployment mysite
+
