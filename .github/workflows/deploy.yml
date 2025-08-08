@@ -44,7 +44,7 @@ jobs:
     - name: Deploy to K3s via SSH
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ secrets.K3S_SERVER_IP }}
+        host: ${{ secrets.VM_IP }}
         username: ${{ secrets.K3S_SERVER_USER }}
         key: ${{ secrets.K3S_SSH_KEY }}
         script: |
