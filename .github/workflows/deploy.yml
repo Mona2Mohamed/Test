@@ -1,4 +1,4 @@
-name: Deploy to K3s M
+name: Deploy to K3s N
 
 on:
   push:
