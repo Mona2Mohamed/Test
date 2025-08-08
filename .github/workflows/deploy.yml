@@ -3,7 +3,7 @@ name: Deploy to K3s
 on:
   push:
     branches:
-      - master
+      - main  # run workflow only when pushing to main branch
 
 jobs:
   build-and-deploy:
@@ -11,24 +11,40 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
-    - name: Build Docker image
-      run: docker build -t mona2mohamed/mysite:latest .
-
-    - name: Push to Docker Hub
-      run: docker push mona2mohamed/mysite:latest
-
-    - name: SSH and update K3s
-      uses: appleboy/ssh-action@master
+    # Step 1: Setup Node for React build
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
       with:
-        host: ${{ secrets.VM_IP }}
-        username: ${{ secrets.VM_USER }}
-        key: ${{ secrets.SSH_KEY }}
+        node-version: 18
+
+    # Step 2: Install deps & build React app
+    - name: Install dependencies and build
+      run: |
+        npm ci
+        npm run build
+
+    # Step 3: Build & push Docker image
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/mysite:latest .
+        docker push ${{ secrets.DOCKER_USERNAME }}/mysite:latest
+
+    # Step 4: Deploy to K3s via SSH
+    - name: Deploy to K3s
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.K3S_SERVER_IP }}
+        username: ${{ secrets.K3S_SERVER_USER }}
+        key: ${{ secrets.K3S_SSH_KEY }}
         script: |
-          docker pull mona2mohamed/mysite:latest
-          kubectl rollout restart deployment mysite
+          kubectl set image deployment/mysite mysite=${{ secrets.DOCKER_USERNAME }}/mysite:latest --record
+          kubectl rollout status deployment/mysite
 
