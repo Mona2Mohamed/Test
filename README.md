@@ -68,5 +68,5 @@ This project demonstrates how to build, containerize, deploy, and automate a Rea
 
 Below is the architecture of the project showing the flow from local build to deployment and CI/CD automation:
 
-![Project Architecture](doc/ChatGPT Image Aug 10, 2025, 06_20_56 PM.png)
+![Project Architecture](doc/architecture.png)
 
