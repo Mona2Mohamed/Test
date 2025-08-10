@@ -61,3 +61,12 @@ This project demonstrates how to build, containerize, deploy, and automate a Rea
   - Built and pushed the Docker image.
   - Updated the deployment on K3s.
   - Successfully rolled o
+
+
+
+## 🖼 Architecture Overview
+
+Below is the architecture of the project showing the flow from local build to deployment and CI/CD automation:
+
+![Project Architecture](doc/ChatGPT Image Aug 10, 2025, 06_20_56 PM.png)
+
